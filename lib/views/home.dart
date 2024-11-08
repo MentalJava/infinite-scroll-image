@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'package:infinite_scroll_image/view_models/image_controller.dart';
+import 'package:infinite_scroll_image/views/widgets/bookmark_gird.dart';
+import 'package:infinite_scroll_image/views/widgets/latest_gird.dart';
+
 class Home extends StatelessWidget {
-  const Home({super.key});
+  Home({
+    super.key,
+  });
+
+  final imageController = Get.put(ImageController());
 
   @override
   Widget build(BuildContext context) {
@@ -11,25 +19,37 @@ class Home extends StatelessWidget {
         title: const Text('IMAGELIST'),
         centerTitle: true,
       ),
-      body: Column(
-        children: [
-          const Text('북마크'),
-          const Text('최신이미지'),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const Text('북마크'),
+              Obx(
+                () => imageController.isLoading.value
+                    ? const Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : SingleChildScrollView(
+                        child: BookmarkGrid(images: imageController.bookmarks)),
               ),
-              itemCount: 10,
-              itemBuilder: (context, index) {
-                return const Text('data');
-              },
-            ),
+              const Text('최신이미지'),
+              Obx(
+                () => imageController.isLoading.value
+                    ? const Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : SingleChildScrollView(
+                        child: Expanded(
+                            child: SizedBox(
+                                height: 400,
+                                child: LatestGird(
+                                    images: imageController.bookmarks))),
+                      ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
